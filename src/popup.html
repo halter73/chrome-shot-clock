@@ -1,0 +1,41 @@
+<!-- Copyright 2017 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file. -->
+<html>
+  <head>
+    <title>Shot Clock Popup</title>
+    <style>
+      body {
+        text-align: center;
+      }
+
+      #shotClockImage {
+        width: 100px;
+        margin: 5px;
+      }
+
+      button {
+        margin: 5px;
+        outline: none;
+      }
+
+      button:hover {
+        outline: #80DEEA dotted thick;
+      }
+    </style>
+    <!--
+      - JavaScript and HTML must be in separate files: see our Content Security
+      - Policy documentation[1] for details and explanation.
+      -
+      - [1]: https://developer.chrome.com/extensions/contentSecurityPolicy
+     -->
+  </head>
+  <body>
+      <img src='./shot-clock-800.png' id='shotClockImage'>
+      <button value='start'>Start</button>
+      <button value='reset'>Reset</button>
+      <button value='stop'>Stop</button>
+      <!-- link to non-persistent background script -->
+      <script src="popup.js"></script>
+  </body>
+</html>

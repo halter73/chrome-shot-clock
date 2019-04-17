@@ -1,0 +1,4 @@
+License notice for DSEG Font Family (v0.45)
+-------------------------------------------
+
+https://github.com/keshikan/DSEG/blob/v0.45/DSEG-LICENSE.txt
