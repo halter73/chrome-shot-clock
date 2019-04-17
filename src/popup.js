@@ -5,7 +5,6 @@
 
 function sendMessage(event) {
   let message = event.target.value;
-  chrome.browserAction.setBadgeText({ text: message });
   chrome.runtime.sendMessage({ action: message });
   window.close();
 }

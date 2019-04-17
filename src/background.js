@@ -15,19 +15,31 @@ function notify(message) {
       priority: 0});
 }
 
+let intervalHandle = null;
+
 chrome.runtime.onMessage.addListener(message => {
-  if (message.action === 'start') {
-    let seconds = 24;
+  switch (message.action) {
+    case 'start':
+    case 'reset':
+      clearInterval(intervalHandle);
+      let seconds = 24;
 
-    let intervalHandle = setInterval(() => {
-      chrome.browserAction.setBadgeText({ text: `${--seconds}` });
+      chrome.browserAction.setBadgeText({ text: `${seconds}` });
 
-      if (seconds === 0) {
-        clearInterval(intervalHandle);
-        notify("Bzzzzzzzzzzz!");
-      }
-    }, 1000);
-  } else {
+      intervalHandle = setInterval(() => {
+        chrome.browserAction.setBadgeText({ text: `${--seconds}` });
+
+        if (seconds === 0) {
+          notify("Bzzzzzzzzzzz!");
+        } else if (seconds <= -300) {
+          clearInterval(intervalHandle);
+        }
+      }, 1000);
+      break;
+    case 'stop':
+      clearInterval(intervalHandle);
+      break;
+    default:
       notify(`Action: ${message.action}`);
   }
 });
