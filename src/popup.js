@@ -4,9 +4,13 @@
 'use strict';
 
 function sendMessage(event) {
-  let message = event.target.value;
-  chrome.runtime.sendMessage({ action: message });
+  chrome.runtime.sendMessage({ action: event.target.value });
   window.close();
 }
 
+function updateSeconds(event) {
+  chrome.runtime.sendMessage({ action: 'update', seconds: event.target.value });
+}
+
 document.querySelectorAll('button').forEach(button => button.addEventListener('click', sendMessage));
+document.querySelector('input[type=number]').addEventListener('input', updateSeconds)

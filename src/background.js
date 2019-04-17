@@ -16,13 +16,14 @@ function notify(message) {
 }
 
 let intervalHandle = null;
+let startingSeconds = 24;
 
 chrome.runtime.onMessage.addListener(message => {
   switch (message.action) {
     case 'start':
     case 'reset':
       clearInterval(intervalHandle);
-      let seconds = 24;
+      let seconds = startingSeconds;
 
       chrome.browserAction.setBadgeText({ text: `${seconds}` });
 
@@ -38,6 +39,9 @@ chrome.runtime.onMessage.addListener(message => {
       break;
     case 'stop':
       clearInterval(intervalHandle);
+      break;
+    case 'update':
+      startingSeconds = message.seconds;
       break;
     default:
       notify(`Action: ${message.action}`);
