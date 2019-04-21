@@ -22,7 +22,7 @@ async function loadFont() {
 }
 
 // If we don't do this, the clock looks fuzzy on high-DPI displays.
-function initCanvas(width, height) {
+function initPopupCanvas(width, height) {
   const canvas = document.querySelector('canvas');
   canvas.width = width * window.devicePixelRatio;
   canvas.height = height * window.devicePixelRatio;
@@ -34,14 +34,49 @@ function initCanvas(width, height) {
   return ctx;
 }
 
+function fillCanvasWithClock(context, size) {
+  const fontSize = .6 * size;
+  context.font = `${fontSize}px DSEG7`;
+  context.fillStyle = '#c43200';
+  context.fillText('2.4', 0, fontSize);
+}
+
+function getClockImage(size) {
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+
+  const context = canvas.getContext('2d');
+  fillCanvasWithClock(context, size);
+  return context.getImageData(0, 0, size, size);
+}
+
+function replaceIcon() {
+  chrome.browserAction.setIcon({
+    imageData: {
+      get 16() {
+        return getClockImage(16);
+      },
+      get 32() {
+        return getClockImage(32);
+      },
+      get 48() {
+        return getClockImage(48);
+      },
+      get 128() {
+        return getClockImage(128);
+      },
+    }
+  });
+}
+
 async function drawClock() {
   await loadFont();
 
-  const ctx = initCanvas(100, 100);
+  const popupContext = initPopupCanvas(100, 100);
+  fillCanvasWithClock(popupContext, 100);
 
-  ctx.font = '60px DSEG7';
-  ctx.fillStyle = '#c43200';
-  ctx.fillText('2.4', 0, 60);
+  replaceIcon();
 }
 
 drawClock();
