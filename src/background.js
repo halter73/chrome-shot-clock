@@ -31,7 +31,7 @@ chrome.runtime.onMessage.addListener(message => {
         chrome.browserAction.setBadgeText({ text: `${--seconds}` });
 
         if (seconds === 0) {
-          notify("Bzzzzzzzzzzz!");
+          notify('Bzzzzzzzzzzz!');
         } else if (seconds <= -300) {
           clearInterval(intervalHandle);
         }
