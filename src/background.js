@@ -1,6 +1,3 @@
-// Copyright 2017 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
 'use strict';
 
 function notify(message) {
@@ -21,7 +18,6 @@ let startingSeconds = 24;
 chrome.runtime.onMessage.addListener(message => {
   switch (message.action) {
     case 'start':
-    case 'reset':
       clearInterval(intervalHandle);
       let seconds = startingSeconds;
 
@@ -39,6 +35,10 @@ chrome.runtime.onMessage.addListener(message => {
       break;
     case 'stop':
       clearInterval(intervalHandle);
+      break;
+    case 'reset':
+      clearInterval(intervalHandle);
+      chrome.browserAction.setBadgeText({ text: `${startingSeconds}` });
       break;
     case 'update':
       startingSeconds = message.seconds;
