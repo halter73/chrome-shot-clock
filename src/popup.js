@@ -32,10 +32,10 @@ function initPopupCanvas(width, height) {
 }
 
 function fillCanvasWithClock(context, size) {
-  const fontSize = .6 * size;
+  const fontSize = .64 * size;
   context.font = `${fontSize}px DSEG7`;
   context.fillStyle = '#c43200';
-  context.fillText('2.4', 0, fontSize);
+  context.fillText('2.4', 0, fontSize * 1.25);
 }
 
 function getClockImage(size) {
