@@ -19,10 +19,10 @@ async function loadFont() {
 }
 
 function fillCanvasWithClock(context, text, size) {
-  const fontSize = .64 * size;
+  const fontSize = .7 * size;
   context.font = `${fontSize}px DSEG7`;
   context.fillStyle = '#c43200';
-  context.fillText(text, 0, fontSize * 1.25);
+  context.fillText(text, -2, fontSize * 1.25);
 }
 
 function getClockImage(text, size) {
@@ -57,6 +57,7 @@ function replaceIcon(text) {
 async function drawClock(text) {
   await loadFont();
 
+  chrome.browserAction.setBadgeText({ text: '' });
   replaceIcon(text);
 }
 
@@ -75,12 +76,11 @@ chrome.runtime.onMessage.addListener(message => {
         --seconds;
 
         if (seconds > 0) {
-          chrome.browserAction.setBadgeText({ text: '' });
           drawClock(seconds);
         } else if (seconds === 0) {
           notify('Bzzzzzzzzzzz!');
           drawClock(seconds);
-        } else if (seconds > -300) {
+        } else if (seconds >= -300) {
           chrome.browserAction.setBadgeText({ text: `${seconds}` });
         } else {
           clearInterval(intervalHandle);
