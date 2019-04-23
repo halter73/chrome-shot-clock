@@ -61,41 +61,61 @@ async function drawClock(text) {
   replaceIcon(text);
 }
 
-let intervalHandle = null;
 let startingSeconds = 24;
+let timeoutHandle = null;
+let endTime = null;
+let expired = false;
+
+function stopClock() {
+  clearTimeout(timeoutHandle);
+  timeoutHandle = null;
+  endTime = null;
+  expired = false;
+}
+
+function updateClock() {
+  const millisecondsFromZero = endTime - Date.now();
+  const secondsFromZero = millisecondsFromZero / 1000;
+
+  if (secondsFromZero >= 10) {
+    drawClock(Math.ceil(secondsFromZero));
+    timeoutHandle = setTimeout(updateClock, millisecondsFromZero % 1000);
+  } else if (secondsFromZero > 0) {
+    // Draw one decimal place below ten seconds.
+    drawClock(secondsFromZero.toFixed(1))
+    timeoutHandle = setTimeout(updateClock, millisecondsFromZero % 100);
+  } else if (!expired) {
+    expired = true;
+    notify('Bzzzzzzzzzzz!');
+    drawClock('0.0');
+    timeoutHandle = setTimeout(updateClock, 1000 + millisecondsFromZero % 1000);
+  } else if (secondsFromZero > -301) {
+    chrome.browserAction.setBadgeText({ text: `${Math.ceil(secondsFromZero)}` });
+    timeoutHandle = setTimeout(updateClock, 1000 + millisecondsFromZero % 1000);
+  } else {
+    stopClock();
+  }
+}
 
 chrome.runtime.onMessage.addListener(message => {
   switch (message.action) {
     case 'start':
-      clearInterval(intervalHandle);
-      let seconds = startingSeconds;
-
-      drawClock(seconds);
-
-      intervalHandle = setInterval(() => {
-        --seconds;
-
-        if (seconds > 0) {
-          drawClock(seconds);
-        } else if (seconds === 0) {
-          notify('Bzzzzzzzzzzz!');
-          drawClock(seconds);
-        } else if (seconds >= -300) {
-          chrome.browserAction.setBadgeText({ text: `${seconds}` });
-        } else {
-          clearInterval(intervalHandle);
-        }
-      }, 1000);
+      stopClock();
+      endTime = Date.now() + startingSeconds * 1000;
+      drawClock(startingSeconds);
+      timeoutHandle = setTimeout(updateClock, 1000);
       break;
     case 'stop':
-      clearInterval(intervalHandle);
+      stopClock();
       break;
     case 'reset':
-      clearInterval(intervalHandle);
-      chrome.browserAction.setBadgeText({ text: `${startingSeconds}` });
+      stopClock();
+      drawClock(startingSeconds);
       break;
     case 'update':
       startingSeconds = message.seconds;
+      stopClock();
+      drawClock(startingSeconds);
       break;
     default:
       notify(`Action: ${message.action}`);
