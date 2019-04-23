@@ -73,7 +73,7 @@ async function drawClock() {
   const popupContext = initPopupCanvas(100, 100);
   fillCanvasWithClock(popupContext, 100);
 
-  replaceIcon();
+  //replaceIcon();
 }
 
 drawClock();

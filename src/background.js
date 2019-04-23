@@ -12,6 +12,54 @@ function notify(message) {
       priority: 0});
 }
 
+async function loadFont() {
+  const font = new FontFace("DSEG7", "url(DSEG7Classic-Bold.woff2)");
+  await font.load();
+  document.fonts.add(font);
+}
+
+function fillCanvasWithClock(context, text, size) {
+  const fontSize = .64 * size;
+  context.font = `${fontSize}px DSEG7`;
+  context.fillStyle = '#c43200';
+  context.fillText(text, 0, fontSize * 1.25);
+}
+
+function getClockImage(text, size) {
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+
+  const context = canvas.getContext('2d');
+  fillCanvasWithClock(context, text, size);
+  return context.getImageData(0, 0, size, size);
+}
+
+function replaceIcon(text) {
+  chrome.browserAction.setIcon({
+    imageData: {
+      get 16() {
+        return getClockImage(text, 16);
+      },
+      get 32() {
+        return getClockImage(text, 32);
+      },
+      get 48() {
+        return getClockImage(text, 48);
+      },
+      get 128() {
+        return getClockImage(text, 128);
+      },
+    }
+  });
+}
+
+async function drawClock(text) {
+  await loadFont();
+
+  replaceIcon(text);
+}
+
 let intervalHandle = null;
 let startingSeconds = 24;
 
@@ -21,14 +69,20 @@ chrome.runtime.onMessage.addListener(message => {
       clearInterval(intervalHandle);
       let seconds = startingSeconds;
 
-      chrome.browserAction.setBadgeText({ text: `${seconds}` });
+      drawClock(seconds);
 
       intervalHandle = setInterval(() => {
-        chrome.browserAction.setBadgeText({ text: `${--seconds}` });
+        --seconds;
 
-        if (seconds === 0) {
+        if (seconds > 0) {
+          chrome.browserAction.setBadgeText({ text: '' });
+          drawClock(seconds);
+        } else if (seconds === 0) {
           notify('Bzzzzzzzzzzz!');
-        } else if (seconds <= -300) {
+          drawClock(seconds);
+        } else if (seconds > -300) {
+          chrome.browserAction.setBadgeText({ text: `${seconds}` });
+        } else {
           clearInterval(intervalHandle);
         }
       }, 1000);
