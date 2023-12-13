@@ -1,17 +1,17 @@
 'use strict';
 
-var startingSeconds = localStorage.startingSeconds || 24;
-var startingSecondsInput = document.querySelector('input[type=number]');
-startingSecondsInput.value = startingSeconds;
-
-chrome.runtime.sendMessage({ action: 'update', seconds: startingSeconds });
-
-startingSecondsInput.addEventListener('input', event => {
-  localStorage.startingSeconds = event.target.value;
-  chrome.runtime.sendMessage({ action: 'update', seconds: event.target.value });
-});
-
 document.querySelectorAll('button').forEach(button => button.addEventListener('click', event => {
   chrome.runtime.sendMessage({ action: event.target.value });
   window.close();
 }));
+
+const startingSecondsInput = document.querySelector('input[type=number]');
+startingSecondsInput.addEventListener('input', async event => {
+  chrome.runtime.sendMessage({ action: 'update', seconds: event.target.value });
+  await chrome.storage.sync.set({ startingSeconds: event.target.value });
+});
+(async () => {
+  var startingSeconds = (await chrome.storage.sync.get('startingSeconds')).startingSeconds || 24;
+  startingSecondsInput.value = startingSeconds;
+  startingSecondsInput.disabled = false;
+})();
