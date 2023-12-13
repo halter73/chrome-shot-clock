@@ -2,19 +2,19 @@
   "name": "Shot Clock",
   "description": "Basketball inspired 24 second shot clock",
   "version": "1.0",
-  "manifest_version": 2,
-  "permissions": ["notifications"],
+  "manifest_version": 3,
+  "permissions": ["notifications", "storage"],
   "background": {
-    "scripts": ["background.js"]
+    "service_worker": "background.js"
   },
-  "browser_action": {
+  "action": {
+    "default_icon": {
+      "16": "shot-clock-16.png",
+      "32": "shot-clock-32.png",
+      "48": "shot-clock-48.png",
+      "128": "shot-clock-128.png"
+    },
     "default_title": "Shot clock",
     "default_popup": "popup.html"
-  },
-  "icons": {
-    "16": "shot-clock-16.png",
-    "32": "shot-clock-32.png",
-    "48": "shot-clock-48.png",
-    "128": "shot-clock-128.png"
   }
 }

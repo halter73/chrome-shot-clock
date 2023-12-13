@@ -7,7 +7,7 @@ function notify(message) {
       title:    'Shot Clock',
       message:  message,
       buttons: [
-        {title: 'Reset'}
+        { title: 'Reset' }
       ],
       priority: 0});
 }
@@ -15,28 +15,25 @@ function notify(message) {
 async function loadFont() {
   const font = new FontFace("DSEG7", "url(DSEG7Classic-Bold.woff2)");
   await font.load();
-  document.fonts.add(font);
+  self.fonts.add(font);
 }
 
 function fillCanvasWithClock(context, text, size) {
-  const fontSize = .7 * size;
+  const fontSize = .64 * size;
   context.font = `${fontSize}px DSEG7`;
   context.fillStyle = '#c43200';
-  context.fillText(text, -2, fontSize * 1.25);
+  context.fillText(text, 0, fontSize * 1.25);
 }
 
 function getClockImage(text, size) {
-  const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-
+  const canvas = new OffscreenCanvas(size, size);
   const context = canvas.getContext('2d');
   fillCanvasWithClock(context, text, size);
   return context.getImageData(0, 0, size, size);
 }
 
 function replaceIcon(text) {
-  chrome.browserAction.setIcon({
+  chrome.action.setIcon({
     imageData: {
       get 16() {
         return getClockImage(text, 16);
@@ -56,12 +53,11 @@ function replaceIcon(text) {
 
 async function drawClock(text) {
   await loadFont();
-
-  chrome.browserAction.setBadgeText({ text: '' });
+  chrome.action.setBadgeText({ text: '' });
   replaceIcon(text);
 }
 
-let startingSeconds = 24;
+let startingSeconds = chrome.storage.startingSeconds || 24;
 let timeoutHandle = null;
 let endTime = null;
 let expired = false;
@@ -90,7 +86,7 @@ function updateClock() {
     drawClock('0.0');
     timeoutHandle = setTimeout(updateClock, 1000 + millisecondsFromZero % 1000);
   } else if (secondsFromZero > -301) {
-    chrome.browserAction.setBadgeText({ text: `${Math.ceil(secondsFromZero)}` });
+    chrome.action.setBadgeText({ text: `${Math.ceil(secondsFromZero)}` });
     timeoutHandle = setTimeout(updateClock, 1000 + millisecondsFromZero % 1000);
   } else {
     stopClock();
@@ -120,8 +116,4 @@ chrome.runtime.onMessage.addListener(message => {
     default:
       notify(`Action: ${message.action}`);
   }
-});
-
-chrome.notifications.onButtonClicked.addListener(() => {
-
 });
